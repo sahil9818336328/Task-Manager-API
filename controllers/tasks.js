@@ -1,21 +1,58 @@
 const Task = require('../models/Tasks')
-const getAllTasks = (req, res) => {
-  res.send('get all tasks')
+const getAllTasks = async (req, res) => {
+  try {
+    const task = await Task.find({})
+    res.status(201).json({ task })
+  } catch (error) {
+    res.status(500).json({ msg: error })
+  }
 }
 const createTask = async (req, res) => {
-  console.log(req.body)
-  const task = await Task.create(req.body)
-  console.log(task)
-  res.status(201).json({ task })
+  try {
+    const task = await Task.create(req.body)
+    res.status(201).json({ task })
+  } catch (error) {
+    res.status(500).json({ msg: error })
+  }
 }
-const getTask = (req, res) => {
-  res.send('get single task')
+const getTask = async (req, res) => {
+  try {
+    const { id: taskID } = req.params
+    const task = await Task.findOne({ _id: taskID })
+    if (!task) {
+      return res.status(404).json({ msg: `No task with id ${taskID}` })
+    }
+    res.status(201).json({ task })
+  } catch (error) {
+    res.status(500).json({ msg: error })
+  }
 }
-const updateTask = (req, res) => {
-  res.send('update task')
+const updateTask = async (req, res) => {
+  try {
+    const { id: taskID } = req.params
+    const task = await Task.findOneAndUpdate({ _id: taskID }, req.body, {
+      new: true,
+      runValidators: true,
+    })
+    if (!task) {
+      return res.status(404).json({ msg: `No task with id ${taskID}` })
+    }
+    res.status(201).json({ msg: `Task with id ${taskID} updated` })
+  } catch (error) {
+    res.status(500).json({ msg: error })
+  }
 }
-const deleteTask = (req, res) => {
-  res.send('delete task')
+const deleteTask = async (req, res) => {
+  try {
+    const { id: taskID } = req.params
+    const task = await Task.findOneAndDelete({ _id: taskID })
+    if (!task) {
+      return res.status(404).json({ msg: `No task with id ${taskID}` })
+    }
+    res.status(201).json({ msg: `Task with id ${taskID} deleted` })
+  } catch (error) {
+    res.status(500).json({ msg: error })
+  }
 }
 
 module.exports = { getAllTasks, createTask, getTask, updateTask, deleteTask }

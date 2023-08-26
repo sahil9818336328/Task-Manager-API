@@ -1,19 +1,17 @@
-require('./db/connect')
 const express = require('express')
 const app = express()
 const connectDB = require('./db/connect')
+const tasks = require('./routes/tasks')
+require('./db/connect')
 require('dotenv').config()
-app.use(express.json())
-
 const port = 5000
 
-const tasks = require('./routes/tasks')
+//middleware
+app.use(express.static('./public'))
+app.use(express.json())
 
+//routes
 app.use('/api/v1/tasks', tasks)
-
-app.get('/', (req, res) => {
-  res.send('Task manager api')
-})
 
 const start = async () => {
   try {
